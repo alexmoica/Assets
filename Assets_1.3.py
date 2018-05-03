@@ -1,6 +1,7 @@
 #Assets 2018 created by Alex Moica
 
 import tkinter as tk
+from tkinter import simpledialog
 import os
 import re
 import sys
@@ -14,7 +15,11 @@ from matplotlib.figure import Figure
 LARGE_FONT = ('Verdana 10 underline')
 BOLD_FONT = ('Verdana 9 bold')
 
-dp = os.path.join(os.path.dirname(__file__),'')
+dp = os.path.join(os.path.dirname(__file__),'Logs\\')
+imgp = os.path.join(os.path.dirname(__file__),'AssetsIcon.ico')
+
+if not os.path.exists(dp):
+    os.makedirs(dp)
 
 def fileOpen(path, type):
 	if os.path.exists(path):
@@ -39,9 +44,7 @@ if os.path.exists(dp+'records.txt'):
 else:
 	recFile = open(dp+'records.txt', 'w')
 	recFile.close
-	recFile = open(dp+'balance.txt', 'r')
-
-recVals = recFile.read().split('\n')
+	recFile = open(dp+'records.txt', 'r')
 
 optionFile = fileOpen(dp+'note options.txt', 'r')
 
@@ -56,21 +59,6 @@ except:
 balFile.close()
 recFile.close()
 optionFile.close()
-
-CxPlot, CCxPlot, SxPlot = [], [], []
-CyPlot, CCyPlot, SyPlot = [], [], []
-
-for i in range(len(recVals)-1):
-	recVals[i] = recVals[i].split(', ')
-	if recVals[i][0] == 'C':
-		CxPlot.append(recVals[i][3])
-		CyPlot.append(float(recVals[i][1]))
-	elif recVals[i][0] == 'CC':
-		CCxPlot.append(recVals[i][3])
-		CCyPlot.append(float(recVals[i][1]))
-	else:
-		SxPlot.append(recVals[i][3])
-		SyPlot.append(float(recVals[i][1]))
 		
 cBalance = float("%.2f" % float(baseVals[0]))
 ccBalance = float("%.2f" % float(baseVals[1]))
@@ -87,36 +75,12 @@ def entryAdd(plotList):
 		for i in plotList:
 			cSum += i
 			yield cSum
-			
-class Assets(tk.Tk):
 
-	def __init__(self, *args, **kwargs):
-		
-		tk.Tk.__init__(self, *args, **kwargs)
-		tk.Tk.wm_title(self, "Assets 1.2")
-		
-		container = tk.Frame(self)
-		
-		container.pack(side='top', fill='both', expand=True)
-		
-		container.grid_rowconfigure(0, weight=1)
-		container.grid_columnconfigure(0, weight=1)
-		
-		self.frames = {}
-		
-		#Initialize all the pages in the app
-		for page in (HomePage, CPage, CCPage, SPage):
-			frame = page(container, self)
-			self.frames[page] = frame
-			frame.grid(row=0, column=0, sticky='nsew')
-		
-		self.show_frame(HomePage)
-	
-	#Show the container based on the frame called
-	def show_frame(self, container):
-		frame = self.frames[container]
+def showFrame(page, container):
+		frame = page(container)
+		frame.grid(row=0, column=0, sticky='nsew')
 		frame.tkraise()
-
+		
 class AutoComplete(tk.Entry):
 	def __init__(self, entries, *args, **kwargs):
 		tk.Entry.__init__(self, *args, **kwargs)
@@ -219,11 +183,13 @@ class AutoComplete(tk.Entry):
 	def compare(self):
 		pattern = re.compile('.*' + self.var.get().upper() + '.*')
 		return [i for i in self.entries if re.match(pattern, i)]
-				
+	
 class HomePage(tk.Frame):
 	
-	def __init__(self, master, controller):			
+	def __init__(self, master):			
 		tk.Frame.__init__(self, master)
+		
+		root.geometry('306x175')
 		
 		x = True
 		for j in range(51):
@@ -232,25 +198,32 @@ class HomePage(tk.Frame):
 				tk.Label(self, bg='#edef58').grid(row=0, column=j)
 			else:
 				tk.Label(self, bg='#000000').grid(row=0, column=j)
-				
+		
 		accLbl = tk.Label(self, text="Accounts", font=LARGE_FONT).grid(row=1, column=0, columnspan=12, sticky='ew')
-
+		
+		def changeCredit():
+			global ccLimit
+			ccLimit = simpledialog.askinteger("Change Credit Limit", "Please enter a new limit:", minvalue = 0)
+			
+		ccLimBtn = tk.Button(self, text="Change Credit Limit", width=15, command=changeCredit)
+		ccLimBtn.grid(row=1, column=1, columnspan=50, sticky='e')
+		
 		#Chequing Objects
 		cLbl = tk.Label(self, text="Chequing").grid(row=2, column=0, columnspan=10, sticky='w')
 		cdLbl = tk.Label(self, text=". "*29).grid(row=2, column=1, columnspan=38, sticky='e')
-		cBtn = tk.Button(self, text="$"+str(cBalance), fg='green', activeforeground='green', width=10, command=lambda: controller.show_frame(CPage))
+		cBtn = tk.Button(self, text="$"+str(cBalance), fg='green', activeforeground='green', width=10, command=lambda: showFrame(CPage, root))
 		cBtn.grid(row=2, column=2, columnspan=50, sticky='e')
 		
 		#Credit Objects
 		ccLbl = tk.Label(self, text="Credit").grid(row=3, column=0, columnspan=10, sticky='w')
 		ccdLbl = tk.Label(self, text=". "*32).grid(row=3, column=1, columnspan=38, sticky='e')
-		ccBtn = tk.Button(self, text="$"+str(ccBalance), fg=balCol, activeforeground=balCol, width=10, command=lambda: controller.show_frame(CCPage))
+		ccBtn = tk.Button(self, text="$"+str(ccBalance), fg=balCol, activeforeground=balCol, width=10, command=lambda: showFrame(CCPage, root))
 		ccBtn.grid(row=3, column=2, columnspan=50, sticky='e')
 		
 		#Savings Objects
 		sLbl = tk.Label(self, text="Savings").grid(row=4, column=0, columnspan=10, sticky='w')
 		sdLbl = tk.Label(self, text=". "*31).grid(row=4, column=1, columnspan=38, sticky='e')
-		sBtn = tk.Button(self, text="$"+str(sBalance), fg='green', activeforeground='green', width=10, command=lambda: controller.show_frame(SPage))
+		sBtn = tk.Button(self, text="$"+str(sBalance), fg='green', activeforeground='green', width=10, command=lambda: showFrame(SPage, root))
 		sBtn.grid(row=4, column=2, columnspan=50, sticky='e')
 		
 		#Function to delete text on click inside entry fields
@@ -298,10 +271,8 @@ class HomePage(tk.Frame):
 				opF.write(note.upper()+"\n")
 				note_entry.entries.append(note.upper())
 			opF.close()
-			
-			print()
 		
-		def PlusClick(): #TODO on click check if the text exists in the note options file already
+		def PlusClick():
 			global cBalance, ccBalance, sBalance, ccLimit
 			isFloat = True
 			if accVar.get() == "(Account)":
@@ -324,7 +295,7 @@ class HomePage(tk.Frame):
 							addToFile("C", float(entry_text.get()), note_entry.get())
 							
 						if (accVar.get()) == "CREDIT":
-							if ccBalance + float(entry_text.get()) > 1000.00:
+							if ccBalance + float(entry_text.get()) > ccLimit:
 								errorLabel['text'] = "Transaction Exceeds Credit Limit"
 							else:
 								ccBalance = ccBalance + float(entry_text.get())
@@ -341,13 +312,12 @@ class HomePage(tk.Frame):
 							sBalance = sBalance + float(entry_text.get())
 							sBtn['text'] = "$"+str("%.2f" % sBalance)
 							addToFile("S", float(entry_text.get()), note_entry.get())
-							
 					else:
 						errorLabel['text'] = "Please Enter an Amount Greater Than $0.00"
 				else:
 					errorLabel['text'] = "Please Enter a Valid Numerical Amount"
 		
-		def MinusClick(): #TODO on click check if the text exists in the note options file already
+		def MinusClick():
 			global cBalance, ccBalance, sBalance
 			isFloat = True
 			
@@ -432,16 +402,28 @@ class HomePage(tk.Frame):
 
 class CPage(tk.Frame):
 	
-	def __init__(self, master, controller):
+	def __init__(self, master):
 		tk.Frame.__init__(self, master)
+		
+		root.geometry('700x368')
 		
 		cLbl = tk.Label(self, text="Chequing Account Summary", font=LARGE_FONT)
 		cLbl.pack(pady=10, padx=10)
 		
-		backBtn = tk.Button(self, text="Accounts", command=lambda: controller.show_frame(HomePage))
+		backBtn = tk.Button(self, text="Home", command=lambda: showFrame(HomePage, root))
 		backBtn.pack()
 		
-		global CxPlot, CyPlot
+		CxPlot, CyPlot = [], []		
+		
+		recFile = open(dp+'records.txt', 'r')
+		recVals = recFile.read().split('\n')
+		recFile.close()
+		
+		for i in range(len(recVals)-1):
+			recVals[i] = recVals[i].split(', ')
+			if recVals[i][0] == 'C':
+				CxPlot.append(recVals[i][3])
+				CyPlot.append(float(recVals[i][1]))
 		
 		f = Figure(figsize=(7,3), dpi = 100)
 		f.set_tight_layout(True)
@@ -502,16 +484,28 @@ class CPage(tk.Frame):
 	
 class CCPage(tk.Frame):
 	
-	def __init__(self, master, controller):
+	def __init__(self, master):
 		tk.Frame.__init__(self, master)
+		
+		root.geometry('700x368')
 		
 		ccLbl = tk.Label(self, text="Credit Account Summary", font=LARGE_FONT)
 		ccLbl.pack(pady=10, padx=10)
 		
-		backBtn = tk.Button(self, text="Accounts", command=lambda: controller.show_frame(HomePage))
+		backBtn = tk.Button(self, text="Home", command=lambda: showFrame(HomePage, root))
 		backBtn.pack()
 		
-		global CCxPlot, CCyPlot
+		CCxPlot, CCyPlot = [], []		
+		
+		recFile = open(dp+'records.txt', 'r')
+		recVals = recFile.read().split('\n')
+		recFile.close()
+		
+		for i in range(len(recVals)-1):
+			recVals[i] = recVals[i].split(', ')
+			if recVals[i][0] == 'CC':
+				CCxPlot.append(recVals[i][3])
+				CCyPlot.append(float(recVals[i][1]))
 		
 		f = Figure(figsize=(7,3), dpi = 100)
 		f.set_tight_layout(True)
@@ -572,16 +566,28 @@ class CCPage(tk.Frame):
 		
 class SPage(tk.Frame):
 	
-	def __init__(self, master, controller):
+	def __init__(self, master):
 		tk.Frame.__init__(self, master)
+		
+		root.geometry('700x368')
 		
 		sLbl = tk.Label(self, text="Savings Account Summary", font=LARGE_FONT)
 		sLbl.pack(pady=10, padx=10)
 		
-		backBtn = tk.Button(self, text="Accounts", command=lambda: controller.show_frame(HomePage))
+		backBtn = tk.Button(self, text="Home", command=lambda: showFrame(HomePage, root))
 		backBtn.pack()
 
-		global SxPlot, SyPlot
+		SxPlot, SyPlot = [], []		
+		
+		recFile = open(dp+'records.txt', 'r')
+		recVals = recFile.read().split('\n')
+		recFile.close()
+		
+		for i in range(len(recVals)-1):
+			recVals[i] = recVals[i].split(', ')
+			if recVals[i][0] == 'S':
+				SxPlot.append(recVals[i][3])
+				SyPlot.append(float(recVals[i][1]))
 		
 		f = Figure(figsize=(7,3), dpi = 100)
 		f.set_tight_layout(True)
@@ -639,13 +645,14 @@ class SPage(tk.Frame):
 		canvas = FigureCanvasTkAgg(f, self)
 		canvas.draw()
 		canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-		
-root = Assets()
 
-imgIcon = tk.PhotoImage(file=dp+'AssetsIcon.ico')
-root.tk.call('wm', 'iconphoto', root._w, imgIcon)
-root.geometry("306x306")
-
-root.resizable(width=False, height=False)
-
-root.mainloop()
+if __name__ == '__main__':
+	root = tk.Tk()
+	root.wm_title("Assets 1.3")
+	
+	imgIcon = tk.PhotoImage(file=imgp)
+	root.tk.call('wm', 'iconphoto', root._w, imgIcon)
+	root.resizable(width=False, height=True)
+	
+	showFrame(HomePage, root)
+	root.mainloop()
