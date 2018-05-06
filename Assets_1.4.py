@@ -62,11 +62,6 @@ ccBalance = float("%.2f" % float(baseVals[1]))
 sBalance = float("%.2f" % float(baseVals[2]))
 ccLimit = 1000.00
 
-if ccBalance > 0.0:
-	balCol = 'red'
-else:
-	balCol = 'green'
-
 #change the Tk window to display only the given frame
 def showFrame(page):
 		page.grid(row=0, column=0, sticky='nsew')
@@ -195,22 +190,34 @@ class HomePage(tk.Frame):
 		ccLimBtn = tk.Button(self, text="Change Credit Limit", width=15, relief='groove', command=changeCredit)
 		ccLimBtn.grid(row=0, column=1, columnspan=50, sticky='e')
 		
+		balFile = open(dp+'balance.txt', 'r')
+		baseVals = balFile.readlines()		
+		cBal = float("%.2f" % float(baseVals[0]))
+		ccBal = float("%.2f" % float(baseVals[1]))
+		sBal = float("%.2f" % float(baseVals[2]))
+		balFile.close()
+		
+		if ccBal > 0.0:
+			balCol = 'red'
+		else:
+			balCol = 'green'
+		
 		#chequing Objects
 		cLbl = tk.Label(self, text="Chequing").grid(row=1, column=0, columnspan=10, sticky='w')
 		cdLbl = tk.Label(self, text=". "*29).grid(row=1, column=1, columnspan=38, sticky='e')
-		cBtn = tk.Button(self, text="$"+str(cBalance), fg='green', activeforeground='green', width=10, command=lambda: showFrame(Page(root, "Chequing", 'C', cBalance))) #lambda links tkinter to callback expression
+		cBtn = tk.Button(self, text="$"+str(cBal), fg='green', activeforeground='green', width=10, command=lambda: showFrame(Page(root, "Chequing", 'C', cBal))) #lambda links tkinter to callback expression
 		cBtn.grid(row=1, column=2, columnspan=50, sticky='e')
 		
 		#credit Objects
 		ccLbl = tk.Label(self, text="Credit").grid(row=2, column=0, columnspan=10, sticky='w')
 		ccdLbl = tk.Label(self, text=". "*32).grid(row=2, column=1, columnspan=38, sticky='e')
-		ccBtn = tk.Button(self, text="$"+str(ccBalance), fg=balCol, activeforeground=balCol, width=10, command=lambda: showFrame(Page(root, "Credit", 'CC', ccBalance)))
+		ccBtn = tk.Button(self, text="$"+str(ccBal), fg=balCol, activeforeground=balCol, width=10, command=lambda: showFrame(Page(root, "Credit", 'CC', ccBal)))
 		ccBtn.grid(row=2, column=2, columnspan=50, sticky='e')
 		
 		#savings Objects
 		sLbl = tk.Label(self, text="Savings").grid(row=3, column=0, columnspan=10, sticky='w')
 		sdLbl = tk.Label(self, text=". "*31).grid(row=3, column=1, columnspan=38, sticky='e')
-		sBtn = tk.Button(self, text="$"+str(sBalance), fg='green', activeforeground='green', width=10, command=lambda: showFrame(Page(root, "Savings", 'S', sBalance)))
+		sBtn = tk.Button(self, text="$"+str(sBal), fg='green', activeforeground='green', width=10, command=lambda: showFrame(Page(root, "Savings", 'S', sBal)))
 		sBtn.grid(row=3, column=2, columnspan=50, sticky='e')
 		
 		#delete text on call
