@@ -37,7 +37,7 @@ if os.path.exists(dp+'balance.txt'):
 	balFile = open(dp+'balance.txt', 'r')
 else:
 	balFile = open(dp+'balance.txt', 'w')
-	balFile.write("0.0\n0.0\n0.0")
+	balFile.write("0.00\n0.00\n0.00")
 	balFile.close()
 	balFile = open(dp+'balance.txt', 'r')
 
@@ -445,9 +445,8 @@ class Page(tk.Frame):
 		addList=[]
 		#each index of yPlot is the sum of its previous indices to be able to graph the overall bank account balances at the time of transaction
 		for i in range(1, len(yPlot)+1):
-			addList.append(sum(yPlot[:i]))
+			addList.append(float("%2.f" %sum(yPlot[:i])))
 		yPlot = addList
-		
 		graphCol = "-g"
 		if abbr == 'CC':
 			if len(yPlot) > 0:
@@ -466,7 +465,7 @@ class Page(tk.Frame):
 				if i != xPlot[0] and i != xPlot[-1]:
 					xtickList.append('') #replace other entries with a blank
 			xtickList.append(xPlot[-1])
-			
+		
 		a.set_xticklabels(xtickList)
 		a.plot(xPlot, yPlot, graphCol, marker='.', markersize='2')
 		
@@ -506,7 +505,7 @@ class Page(tk.Frame):
 
 if __name__ == '__main__': #code only executed to run as a program not when simply imported as a module
 	root = tk.Tk()
-	root.wm_title("Assets 1.4.1")
+	root.wm_title("Assets 1.4.2")
 	
 	imgIcon = tk.PhotoImage(file=imgp)
 	root.tk.call('wm', 'iconphoto', root._w, imgIcon)
