@@ -250,7 +250,7 @@ class HomePage(tk.Frame):
 			global cBalance, ccBalance, sBalance, nOptions
 			
 			balF = open(dp+'balance.txt', 'w')
-			balF.write(str(cBalance)+"\n"+str(ccBalance)+"\n"+str(sBalance)+"\n")
+			balF.write(str("%.2f" % cBalance)+"\n"+str("%.2f" % ccBalance)+"\n"+str("%.2f" % sBalance)+"\n")
 			balF.close()
 			
 			recF = open(dp+'records.txt', 'a')
@@ -315,7 +315,6 @@ class HomePage(tk.Frame):
 		def MinusClick():
 			global cBalance, ccBalance, sBalance
 			isFloat = True
-			
 			if accVar.get() == "(Account)":
 				errorLabel['text'] = "Please Choose an Account"
 			elif note_entry.get() == "(Note)" or note_entry.get().isspace() or not note_entry.get():
@@ -507,7 +506,7 @@ class Page(tk.Frame):
 
 if __name__ == '__main__': #code only executed to run as a program not when simply imported as a module
 	root = tk.Tk()
-	root.wm_title("Assets 1.4")
+	root.wm_title("Assets 1.4.1")
 	
 	imgIcon = tk.PhotoImage(file=imgp)
 	root.tk.call('wm', 'iconphoto', root._w, imgIcon)
