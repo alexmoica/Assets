@@ -63,7 +63,7 @@ for i in range(len(baseVals)):
 		baseVals[i] = "%.2f" % baseVals[i]
 
 cBalance = float("%.2f" % float(baseVals[0]))
-ccBalance = ("%.2f" % float(baseVals[1]))
+ccBalance = float("%.2f" % float(baseVals[1]))
 sBalance = float("%.2f" % float(baseVals[2]))
 ccLimit = 1000.00
 
@@ -322,10 +322,13 @@ class HomePage(tk.Frame):
 							addToFile("C", float(entry_text.get()), note_entry.get())
 							
 						if (accVar.get()) == "CREDIT":
+							print(ccBalance, type(ccBalance), type(cBalance))
 							if ccBalance + float(entry_text.get()) > ccLimit:
 								errorLabel['text'] = "Transaction Exceeds Credit Limit"
 							else:
+								print(ccBalance)
 								ccBalance = ccBalance + float(entry_text.get())
+								print(ccBalance)
 								if ccBalance > 0.0:
 									ccBtn['fg'] = 'red'
 									ccBtn['activeforeground'] = 'red'
